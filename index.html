@@ -1498,9 +1498,14 @@
             });
         }
 
+                // ========== DEFAULT DATA ==========
         async function initDefaultData() {
+            // فحص لو تم رفع البيانات الافتراضية مسبقاً لمنع التكرار حتى لو المعرض فارغ
+            if (localStorage.getItem('rona_setup_done') === 'true') return;
+
             if ((await DataLayer.getCollection('gallery')).length === 0) {
                 const imgs = [
+
                     { url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80', title: 'لحظة الفرح', category: 'wedding' },
                     { url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&q=80', title: 'بورتريه أنيق', category: 'portrait' },
                     { url: 'https://images.unsplash.com/photo-1504276048855-f3d60e69632f?w=600&q=80', title: 'تصوير منتج', category: 'product' },
@@ -1541,7 +1546,9 @@
             }
             if (!await DataLayer.getSiteContent('footer')) {
                 await DataLayer.saveSiteContent('footer', { copyright: '© 2026 Rona El Sayed. جميع الحقوق محفوظة.' });
-            }
+
+          }
+            localStorage.setItem('rona_setup_done', 'true');
         }
 
         async function loadContent() {
