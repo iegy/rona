@@ -468,27 +468,21 @@
             0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
             50% { transform: translateX(-50%) scale(1.8); opacity: 1; }
         }
-                .about-grid {
+        .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 50px;
             align-items: center;
-            justify-items: center; /* السطر الجديد لتوسيط العناصر أفقياً داخل العمودين */
-        }
-
+            justify-items: center;
         }
         .about-image-wrapper {
             position: relative;
             border-radius: var(--radius-lg);
             overflow: hidden;
             aspect-ratio: 3/4;
-            max-height: 420px;   /* صغرنا الارتفاع الأقصى عشان متخدش الشاشة كلها */
-            width: 320px;        /* حددنا عرض ثابت وأنيق للصورة البورتريه */
-            margin: 0 auto;      /* التوسيط السحري */
-
-
-        }
-
+            max-height: 420px;   
+            width: 320px;        
+            margin: 0 auto;      
         }
         .about-image-wrapper img {
             width: 100%;
@@ -821,7 +815,7 @@
         .calendar-inline:focus-within { border-color: var(--gold); }
         .calendar-header {
             display: flex;
-            justify-content: space-between;
+            justify-between: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
@@ -1109,6 +1103,7 @@
             .mobile-menu-btn { display: block; }
             .hero-title { font-size: 2.4rem; }
             .form-row { grid-template-columns: 1fr; }
+            .about-image-wrapper { width: 280px; max-height: 370px; }
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
             .admin-panel { width: 98vw; padding: 16px; max-height: 90vh; border-radius: var(--radius-md); }
             .admin-tabs { gap: 4px; }
@@ -1139,23 +1134,6 @@
             <li><button class="mode-toggle" id="modeToggle" title="تبديل الوضع">🌓</button></li>
         </ul>
     </nav>
-
-    <section class="hero" id="hero">
-        <div class="hero-bg" id="heroBg"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <p class="hero-subtitle" id="heroSubtitle"></p>
-            <h1 class="hero-title" id="heroTitle"></h1>
-            <p class="hero-desc" id="heroDesc"></p>
-            <div class="hero-buttons">
-                <a href="#gallery" class="btn btn-primary"><i class="fas fa-images"></i> استعرض الأعمال</a>
-                <a href="#booking" class="btn btn-outline"><i class="fas fa-calendar-alt"></i> احجز جلسة</a>
-            </div>
-        </div>
-        <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView()">
-            <span>اكتشف المزيد</span><i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
 
     <section class="section" id="about">
         <div class="section-header">
@@ -1235,6 +1213,7 @@
             </div>
         </div>
     </section>
+
     <footer class="contact-section" id="contact">
         <div class="section-header">
             <p class="section-label">connect</p>
@@ -1400,7 +1379,6 @@
     </div>
 
     <script>
-        // الكود المصدري المحدث لربط الـ Firebase والـ Authentication المشفر بالكامل لقواعد البيانات
         const firebaseConfig = {
             apiKey: "AIzaSyCM7dSEaFwn8K9Om2QhJyGMuVTBelfJOws",
             authDomain: "myronadisa.firebaseapp.com",
@@ -1491,7 +1469,6 @@
         });
         if (localStorage.getItem('rona_mode') === 'light') document.body.classList.add('light-mode');
 
-        // مراقب حالة الأمان والحسابات السحابية المحدث
         if (db) {
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
@@ -1507,14 +1484,11 @@
             });
         }
 
-                // ========== DEFAULT DATA ==========
         async function initDefaultData() {
-            // فحص لو تم رفع البيانات الافتراضية مسبقاً لمنع التكرار حتى لو المعرض فارغ
             if (localStorage.getItem('rona_setup_done') === 'true') return;
 
             if ((await DataLayer.getCollection('gallery')).length === 0) {
                 const imgs = [
-
                     { url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80', title: 'لحظة الفرح', category: 'wedding' },
                     { url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&q=80', title: 'بورتريه أنيق', category: 'portrait' },
                     { url: 'https://images.unsplash.com/photo-1504276048855-f3d60e69632f?w=600&q=80', title: 'تصوير منتج', category: 'product' },
@@ -1555,8 +1529,7 @@
             }
             if (!await DataLayer.getSiteContent('footer')) {
                 await DataLayer.saveSiteContent('footer', { copyright: '© 2026 Rona El Sayed. جميع الحقوق محفوظة.' });
-
-          }
+            }
             localStorage.setItem('rona_setup_done', 'true');
         }
 
@@ -1753,7 +1726,6 @@
 
         function closeAdminPanel() { $('#adminOverlay').classList.remove('active'); }
 
-        // تسجيل الدخول المشفر والموثق
         async function adminLogin() {
             const password = $('#adminPassword').value;
             const email = "rona@mo.com"; 
@@ -1788,7 +1760,6 @@
             }
         }
 
-        // دالة تحديث كلمة المرور السحابية
         async function changeAdminPassword() {
             const newPassword = $('#newAdminPasswordInput').value;
             if (!newPassword || newPassword.length < 6) {
