@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رونا السيد | Rona El Sayed - Photography</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #141414;
+            --gold: #c9a96e;
+            --gold-light: #d4b87a;
+            --gold-dark: #b8944f;
+            --gold-pale: #e8d5b0;
+            --text-primary: #f0ebe3;
+            --text-secondary: #b8b0a5;
+            --text-muted: #7a7368;
+            --border: #2a2520;
+            --border-light: #3a3530;
+            --danger: #c0392b;
+            --success: #27ae60;
+            --info: #2980b9;
+            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-slow: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        body.light-mode {
+            --bg-primary: #f8f5f0;
+            --bg-secondary: #ffffff;
+            --bg-card: #f0ebe3;
+            --text-primary: #2c2416;
+            --text-secondary: #5e5240;
+            --text-muted: #8a7e6b;
+            --border: #d4c9b5;
+            --border-light: #e3d9c6;
+            --gold: #b8944f;
+            --gold-light: #c9a96e;
+            --gold-dark: #9a7a3a;
+            --gold-pale: #dcc8a0;
+            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(201, 169, 110, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(201, 169, 110, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(201, 169, 110, 0.02) 0%, transparent 40%);
+            transition: background 0.4s ease;
+        }
+        .light-mode body::before {
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(184, 148, 79, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(184, 148, 79, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(184, 148, 79, 0.03) 0%, transparent 40%);
+        }
+        body>* {
+            position: relative;
+            z-index: 1;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.6s ease;
+            flex-direction: column;
+            gap: 18px;
+        }
+        #page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-ring {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        .loader-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--gold);
+            letter-spacing: 3px;
+            font-size: 0.85rem;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.4s ease;
+            background: transparent;
+        }
+        .main-nav.scrolled {
+            background: rgba(13, 13, 13, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 40px;
+            box-shadow: 0 2px 25px rgba(0, 0, 0, 0.35);
+            border-bottom: 1px solid var(--border);
+        }
+        .light-mode .main-nav.scrolled {
+            background: rgba(255, 255, 255, 0.92);
+        }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+        .nav-logo:hover {
+            color: var(--gold-light);
+        }
+        .nav-logo span {
+            font-weight: 300;
+            color: var(--text-primary);
+            font-style: italic;
+            transition: color 0.3s;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+            padding: 4px 0;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: var(--gold);
+            transition: 0.3s;
+            border-radius: 1px;
+        }
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-links .btn-book-nav {
+            background: var(--gold);
+            color: #0d0d0d;
+            padding: 9px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+        }
+        .nav-links .btn-book-nav:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 169, 110, 0.3);
+        }
+        .nav-links .btn-book-nav::after {
+            display: none;
+        }
+        .nav-links .mode-toggle {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .nav-links .mode-toggle:hover {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+            transform: rotate(20deg);
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 6px;
+            transition: color 0.3s;
+        }
+        .mobile-menu-btn:hover {
+            color: var(--gold);
+        }
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 650px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.35) saturate(0.8);
+            transform: scale(1.05);
+            transition: transform 8s ease;
+        }
+        .hero:hover .hero-bg {
+            transform: scale(1);
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+        }
+        .hero-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--gold-light);
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeUp 1s 0.2s forwards;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: fadeUp 1s 0.4s forwards;
+        }
+        .hero-title span {
+            color: var(--gold);
+            font-style: italic;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeUp 1s 0.6s forwards;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 1s 0.8s forwards;
+        }
+        .btn {
+            padding: 13px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--gold);
+            color: #0d0d0d;
+        }
+        .btn-primary:hover {
+            background: var(--gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(201, 169, 110, 0.35);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+        }
+        .btn-outline:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s;
+        }
+        .scroll-indicator:hover {
+            color: var(--gold-light);
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(12px); }
+        }
+        .section {
+            padding: 90px 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 55px;
+            position: relative;
+        }
+        .section-label {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .light-mode .section-title {
+            color: var(--text-primary);
+        }
+        .section-line {
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 16px auto 0;
+            border-radius: 2px;
+            position: relative;
+        }
+        .section-line::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+            50% { transform: translateX(-50%) scale(1.8); opacity: 1; }
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .about-image-wrapper {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            max-height: 550px;
+        }
+        .about-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.6s;
+        }
+        .about-image-wrapper:hover img {
+            transform: scale(1.04);
+        }
+        .about-image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 2px solid var(--gold);
+            border-radius: var(--radius-lg);
+            transform: translate(16px, 16px);
+            z-index: -1;
+            opacity: 0.5;
+            transition: 0.4s;
+        }
+        .about-image-wrapper:hover::after {
+            transform: translate(10px, 10px);
+            opacity: 0.8;
+        }
+        .about-text h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 14px;
+            position: relative;
+            display: inline-block;
+        }
+        .about-text h3::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 1px;
+            transition: width 0.4s;
+        }
+        .about-text h3:hover::after {
+            width: 100%;
+        }
+        .light-mode .about-text h3 {
+            color: var(--text-primary);
+        }
+        .about-text p {
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+            line-height: 1.9;
+        }
+        .about-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: 0.3s;
+            min-width: 90px;
+        }
+        .stat-item:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .gallery-filters {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border-light);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            letter-spacing: 0.5px;
+        }
+        .filter-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .filter-btn.active {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(201, 169, 110, 0.25);
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 4/3;
+            background: var(--bg-card);
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .gallery-item:hover {
+            border-color: var(--gold-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.08);
+        }
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.35s;
+            gap: 12px;
+        }
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+        .gallery-item-overlay i {
+            color: #fff;
+            font-size: 1.4rem;
+            background: rgba(255, 255, 255, 0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            backdrop-filter: blur(4px);
+        }
+        .gallery-item-overlay i:hover {
+            background: var(--gold);
+            color: #0d0d0d;
+            transform: scale(1.1);
+        }
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.96);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.35s ease;
+            backdrop-filter: blur(6px);
+        }
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            transition: transform 0.3s;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            font-family: inherit;
+            line-height: 1;
+        }
+        .lightbox-close:hover {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+            transform: rotate(90deg);
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .lightbox-nav:hover {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+        }
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+
+        .booking-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .booking-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .light-mode .booking-info h3 { color: var(--text-primary); }
+        .booking-info p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .booking-info ul { list-style: none; }
+        .booking-info li {
+            padding: 10px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .booking-info li:hover {
+            color: var(--text-primary);
+            padding-right: 6px;
+        }
+        .booking-info li i { color: var(--gold); font-size: 1rem; }
+        .booking-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.08);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .calendar-inline {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            user-select: none;
+            transition: border-color 0.3s;
+        }
+        .calendar-inline:focus-within { border-color: var(--gold); }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .calendar-header button {
+            background: none;
+            border: none;
+            color: var(--gold);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .calendar-header button:hover { background: rgba(201, 169, 110, 0.15); }
+        .calendar-month-label {
+            font-weight: 600;
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
+        }
+        .light-mode .calendar-month-label { color: var(--text-primary); }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+        .calendar-day {
+            padding: 9px 4px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            transition: 0.25s;
+        }
+        .calendar-day:hover {
+            background: rgba(201, 169, 110, 0.15);
+            border-color: var(--gold-dark);
+        }
+        .calendar-day.selected {
+            background: var(--gold);
+            color: #0d0d0d;
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(201, 169, 110, 0.3);
+        }
+        .calendar-day.booked {
+            background: rgba(192, 57, 43, 0.3);
+            color: #e74c3c;
+            cursor: not-allowed;
+            text-decoration: line-through;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        .calendar-day.today { border-color: var(--gold-light); font-weight: 600; }
+        .calendar-day.other-month { color: var(--text-muted); opacity: 0.4; pointer-events: none; }
+        .time-slots { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .time-slot {
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .time-slot:hover { border-color: var(--gold); color: var(--gold); }
+        .time-slot.selected {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(201, 169, 110, 0.3);
+        }
+        .booking-success { text-align: center; padding: 30px; display: none; animation: fadeUp 0.5s ease forwards; }
+        .booking-success.show { display: block; }
+        .booking-success i { font-size: 4rem; color: var(--gold); margin-bottom: 14px; animation: popIn 0.6s ease forwards; }
+        .booking-success h3 { font-family: 'Playfair Display', serif; color: #fff; margin-bottom: 8px; }
+        .booking-success p { color: var(--text-secondary); margin-bottom: 20px; }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .contact-section { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 60px 40px 30px; text-align: center; }
+        .social-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .social-link {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+        .social-link:hover {
+            background: var(--gold);
+            color: #0d0d0d;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(201, 169, 110, 0.25);
+            border-color: var(--gold);
+        }
+        .footer-text { color: var(--text-muted); font-size: 0.8rem; margin-top: 16px; letter-spacing: 0.5px; }
+        .made-by { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.8rem; background: var(--bg-primary); border-top: 1px solid var(--border); letter-spacing: 0.4px; }
+        .made-by i { color: #e74c3c; animation: heartbeat 1.5s ease-in-out infinite; }
+        .made-by span { color: var(--gold); font-weight: 600; }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            60% { transform: scale(1); }
+        }
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--gold);
+            color: #0d0d0d;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+            transition: 0.3s;
+        }
+        .admin-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 25px rgba(201, 169, 110, 0.4); }
+        .admin-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.82);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.35s ease;
+            backdrop-filter: blur(4px);
+        }
+        .admin-overlay.active { opacity: 1; visibility: visible; }
+        .admin-panel {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            width: 95vw;
+            max-width: 1000px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+        .admin-panel h4 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 16px; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .admin-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 1;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .admin-close:hover { background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        .admin-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+        .admin-tab {
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: 1px solid var(--border-light);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .admin-tab:hover { border-color: var(--gold); color: var(--gold); }
+        .admin-tab.active {
+            background: var(--gold);
+            color: #0d0d0d;
+            border-color: var(--gold);
+            font-weight: 600;
+            box-shadow: 0 3px 12px rgba(201, 169, 110, 0.2);
+        }
+        .admin-content-panel { display: none; animation: fadeUp 0.4s ease forwards; }
+        .admin-content-panel.active { display: block; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .admin-table th, .admin-table td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+        .admin-table th { color: var(--gold); font-weight: 600; letter-spacing: 0.5px; font-size: 0.8rem; }
+        .admin-table tbody tr { transition: 0.25s; }
+        .admin-table tbody tr:hover { background: rgba(201, 169, 110, 0.04); }
+        .badge { padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; display: inline-block; letter-spacing: 0.4px; }
+        .badge-pending { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+        .badge-confirmed { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+        .badge-completed { background: rgba(41, 128, 185, 0.2); color: #2980b9; }
+        .badge-cancelled { background: rgba(192, 57, 43, 0.2); color: #c0392b; }
+        .btn-sm { padding: 5px 14px; border-radius: 50px; font-size: 0.75rem; cursor: pointer; border: none; font-family: inherit; font-weight: 600; letter-spacing: 0.3px; transition: 0.3s; }
+        .btn-sm.btn-success { background: var(--success); color: #fff; }
+        .btn-sm.btn-success:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .btn-sm.btn-danger { background: var(--danger); color: #fff; }
+        .btn-sm.btn-danger:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .btn-sm.btn-info { background: var(--info); color: #fff; }
+        .btn-sm.btn-info:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .booking-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 14px; text-align: center; border: 1px solid var(--border-light); transition: 0.3s; }
+        .stat-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif; }
+        .search-filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .search-filter-bar input, .search-filter-bar select { padding: 8px 14px; border-radius: 50px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-primary); font-family: inherit; transition: 0.3s; }
+        .search-filter-bar input:focus, .search-filter-bar select:focus { outline: none; border-color: var(--gold); }
+        .booking-row { cursor: pointer; }
+        .booking-row:hover { background: rgba(201, 169, 110, 0.06) !important; }
+        .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); z-index: 30000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.35s ease; backdrop-filter: blur(4px); }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-secondary); border-radius: var(--radius-lg); width: 90vw; max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 30px; border: 1px solid var(--border); position: relative; box-shadow: var(--shadow-lg); animation: modalSlideIn 0.4s ease forwards; }
+        @keyframes modalSlideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content h4 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 16px; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .modal-close { position: absolute; top: 12px; left: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light); color: #fff; font-size: 1.2rem; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; font-family: inherit; }
+        .modal-close:hover { background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        .image-upload-area { border: 2px dashed var(--border-light); border-radius: var(--radius-md); padding: 20px; text-align: center; cursor: pointer; margin: 10px 0; background: var(--bg-card); transition: 0.3s; color: var(--text-muted); }
+        .image-upload-area:hover { border-color: var(--gold); background: rgba(201, 169, 110, 0.03); }
+        .image-upload-area i { font-size: 2rem; margin-bottom: 8px; display: block; color: var(--gold); }
+        .image-upload-area img { max-width: 200px; max-height: 150px; margin-top: 10px; display: none; border-radius: var(--radius-sm); }
+        #adminLoginSection { text-align: center; padding: 20px; }
+        #adminLoginSection h4 { border-bottom: none; margin-bottom: 20px; }
+        #adminLoginSection input { padding: 11px 14px; border-radius: 50px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-primary); font-family: inherit; width: 220px; text-align: center; margin-bottom: 12px; transition: 0.3s; }
+        #adminLoginSection input:focus { outline: none; border-color: var(--gold); }
+        .stats-editor { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .stats-editor input { width: 80px; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-primary); font-family: inherit; text-align: center; }
+        .admin-form-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .admin-form-row input { flex: 1; min-width: 100px; padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-primary); font-family: inherit; }
+
+        @media (max-width: 1024px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .booking-wrapper { grid-template-columns: 1fr; }
+            .section { padding: 60px 20px; }
+            .about-image-wrapper::after { transform: translate(10px, 10px); }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                left: 0;
+                background: rgba(13, 13, 13, 0.97);
+                flex-direction: column;
+                padding: 20px;
+                gap: 14px;
+                border-bottom: 1px solid var(--border);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+            .nav-links.open { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .hero-title { font-size: 2.4rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+            .admin-panel { width: 98vw; padding: 16px; max-height: 90vh; border-radius: var(--radius-md); }
+            .admin-tabs { gap: 4px; }
+            .admin-tab { padding: 6px 12px; font-size: 0.7rem; }
+            .modal-content { padding: 20px; width: 95vw; }
+            .lightbox-nav { width: 38px; height: 38px; font-size: 1.1rem; }
+            .lightbox-prev { left: 8px; }
+            .lightbox-next { right: 8px; }
+            .lightbox-close { top: 10px; right: 10px; width: 36px; height: 36px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="page-loader">
+        <div class="loader-ring"></div>
+        <span class="loader-text">Rona El Sayed</span>
+    </div>
+
+    <nav class="main-nav" id="mainNav">
+        <a href="#hero" class="nav-logo">Rona <span>El Sayed</span></a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#about">عنّي</a></li>
+            <li><a href="#gallery">معرض الأعمال</a></li>
+            <li><a href="#booking">حجز جلسة</a></li>
+            <li><a href="#contact">تواصل</a></li>
+            <li><a href="#booking" class="btn-book-nav">احجز الآن</a></li>
+            <li><button class="mode-toggle" id="modeToggle" title="تبديل الوضع">🌓</button></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-subtitle" id="heroSubtitle"></p>
+            <h1 class="hero-title" id="heroTitle"></h1>
+            <p class="hero-desc" id="heroDesc"></p>
+            <div class="hero-buttons">
+                <a href="#gallery" class="btn btn-primary"><i class="fas fa-images"></i> استعرض الأعمال</a>
+                <a href="#booking" class="btn btn-outline"><i class="fas fa-calendar-alt"></i> احجز جلسة</a>
+            </div>
+        </div>
+        <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView()">
+            <span>اكتشف المزيد</span><i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <section class="section" id="about">
+        <div class="section-header">
+            <p class="section-label">about</p>
+            <h2 class="section-title">عن رونا السيد</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="about-grid">
+            <div class="about-image-wrapper"><img id="aboutImage" src="" alt="رونا السيد"></div>
+            <div class="about-text">
+                <h3 id="aboutHeading"></h3>
+                <p id="aboutPara1"></p>
+                <p id="aboutPara2"></p>
+                <div class="about-stats" id="aboutStats">
+                    <div class="stat-item"><div class="stat-number" data-count="0">0</div><div class="stat-label">جلسات تصوير</div></div>
+                    <div class="stat-item"><div class="stat-number" data-count="0">0</div><div class="stat-label">عملاء سعداء</div></div>
+                    <div class="stat-item"><div class="stat-number" data-count="0">0</div><div class="stat-label">سنوات خبرة</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="gallery">
+        <div class="section-header">
+            <p class="section-label">portfolio</p>
+            <h2 class="section-title">معرض الأعمال</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="gallery-filters" id="galleryFilters"></div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)"><i class="fas fa-chevron-left"></i></button>
+        <img src="" id="lightboxImg" alt="معرض الصور">
+    </div>
+
+    <section class="section" id="booking">
+        <div class="section-header">
+            <p class="section-label">booking</p>
+            <h2 class="section-title">احجز جلستك</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="booking-wrapper">
+            <div class="booking-info">
+                <h3 id="bookingInfoTitle"></h3>
+                <p id="bookingInfoDesc"></p>
+                <ul id="bookingFeaturesList"></ul>
+            </div>
+            <div id="bookingFormContainer">
+                <form class="booking-form" id="bookingForm" onsubmit="submitBooking(event)">
+                    <div class="form-row">
+                        <div class="form-group"><label>الاسم *</label><input type="text" id="bookingName" required></div>
+                        <div class="form-group"><label>البريد *</label><input type="email" id="bookingEmail" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>الهاتف *</label><input type="tel" id="bookingPhone" required></div>
+                        <div class="form-group"><label>نوع الجلسة *</label><select id="bookingService" required><option value="">اختر</option><option value="wedding">أفراح</option><option value="portrait">بورتريه</option><option value="product">منتجات</option><option value="event">مناسبات</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>عدد الساعات</label><input type="number" id="bookingHours" value="2" min="1"></div>
+                        <div class="form-group"><label>الموقع</label><input type="text" id="bookingLocation"></div>
+                    </div>
+                    <div class="form-group"><label>التاريخ *</label><div class="calendar-inline" id="bookingCalendar"></div><input type="hidden" id="selectedDate" required></div>
+                    <div class="form-group"><label>الوقت *</label><div class="time-slots" id="timeSlots"></div><input type="hidden" id="selectedTime" required></div>
+                    <div class="form-group"><label>ملاحظات</label><textarea id="bookingNotes" rows="2"></textarea></div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-paper-plane"></i> تأكيد الحجز</button>
+                </form>
+                <div class="booking-success" id="bookingSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>تم الاستلام!</h3>
+                    <p>سنتواصل معك قريباً.</p>
+                    <button class="btn btn-primary" onclick="resetBookingForm()">حجز آخر</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="contact-section" id="contact">
+        <div class="section-header">
+            <p class="section-label">connect</p>
+            <h2 class="section-title">تواصل معي</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="social-links" id="socialLinksContainer"></div>
+        <p class="footer-text" id="footerCopyright"></p>
+    </footer>
+
+    <div class="made-by">Made with <i class="fas fa-heart"></i> by <span>Mo Hussein</span></div>
+
+    <button class="admin-trigger" onclick="openAdminPanel()" title="لوحة التحكم"><i class="fas fa-cog"></i></button>
+
+    <div class="admin-overlay" id="adminOverlay">
+        <div class="admin-panel">
+            <button class="admin-close" onclick="closeAdminPanel()">&times;</button>
+            <div id="adminLoginSection">
+                <h4>🔐 دخول لوحة التحكم الآمن</h4>
+                <input type="password" id="adminPassword" placeholder="كلمة المرور"><br>
+                <button class="btn btn-primary" onclick="adminLogin()">دخول</button>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;">مؤمن بواسطة Firebase Authentication</p>
+            </div>
+            <div id="adminContentSection" style="display:none;">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="tab-bookings">📋 الحجوزات</button>
+                    <button class="admin-tab" data-tab="tab-hero">🏠 Hero</button>
+                    <button class="admin-tab" data-tab="tab-about">👤 عني</button>
+                    <button class="admin-tab" data-tab="tab-gallery">🖼️ المعرض</button>
+                    <button class="admin-tab" data-tab="tab-bookinginfo">📋 معلومات الحجز</button>
+                    <button class="admin-tab" data-tab="tab-social">🔗 التواصل</button>
+                    <button class="admin-tab" data-tab="tab-footer">📄 الفوتر</button>
+                    <button class="admin-tab" data-tab="tab-backup">💾 الإعدادات والأمان</button>
+                    <button class="admin-tab" onclick="adminLogout()" style="background:var(--danger);color:#fff;">🚪 خروج</button>
+                </div>
+
+                <div class="admin-content-panel active" id="tab-bookings">
+                    <h4>📋 إدارة الحجوزات</h4>
+                    <div class="booking-stats" id="bookingStats"></div>
+                    <div class="search-filter-bar">
+                        <input type="text" id="bookingSearch" placeholder="بحث باسم العميل..." oninput="filterBookings()">
+                        <select id="bookingStatusFilter" onchange="filterBookings()">
+                            <option value="all">الكل</option>
+                            <option value="pending">قيد الانتظار</option>
+                            <option value="confirmed">مؤكد</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </div>
+                    <table class="admin-table" id="adminBookingsTable">
+                        <thead><tr><th>العميل</th><th>التاريخ</th><th>الوقت</th><th>النوع</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="admin-content-panel" id="tab-hero">
+                    <h4>🏠 تعديل Hero</h4>
+                    <div class="form-group"><label>العنوان الفرعي</label><input id="editHeroSubtitle"></div>
+                    <div class="form-group"><label>العنوان الرئيسي</label><input id="editHeroTitle"></div>
+                    <div class="form-group"><label>الوصف</label><textarea id="editHeroDesc"></textarea></div>
+                    <div class="form-group"><label>رابط صورة الخلفية</label><input id="editHeroBg"></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSiteSection('hero')">💾 حفظ التعديلات</button>
+                </div>
+
+                <div class="admin-content-panel" id="tab-about">
+                    <h4>👤 تعديل قسم عني</h4>
+                    <div class="form-group"><label>رابط الصورة الشخصية</label><input id="editAboutImage"></div>
+                    <div class="form-group"><label>العنوان الرئيسي</label><input id="editAboutHeading"></div>
+                    <div class="form-group"><label>الفقرة الأولى</label><textarea id="editAboutPara1"></textarea></div>
+                    <div class="form-group"><label>الفقرة الثانية</label><textarea id="editAboutPara2"></textarea></div>
+                    <div class="stats-editor">
+                        <label>جلسات تصوير:</label><input type="number" id="editStat1">
+                        <label>عملاء:</label><input type="number" id="editStat2">
+                        <label>خبرة سنين:</label><input type="number" id="editStat3">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSiteSection('about')">💾 حفظ التعديلات</button>
+                </div>
+
+                <div class="admin-content-panel" id="tab-gallery">
+                    <h4>🖼️ إدارة معرض الأعمال</h4>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i> اضغط لاختيار صورة محلياً
+                        <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+                        <img id="imagePreview" alt="معاينة">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" id="newImageTitle" placeholder="عنوان الصورة اختياري">
+                        <select id="newImageCategory"></select>
+                        <button class="btn btn-primary btn-sm" onclick="addGalleryImage()">➕ إضافة للمعرض</button>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px;">
+                        <input type="text" id="newCategoryName" placeholder="اسم فئة جديدة مصنفة" style="flex:1;">
+                        <button class="btn-sm btn-info" onclick="addNewCategory()">➕ إضافة فئة تصنيفية</button>
+                    </div>
+                    <table class="admin-table" id="adminGalleryTable" style="margin-top:12px;">
+                        <thead><tr><th>الصورة</th><th>العنوان</th><th>التصنيف</th><th>حذف</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="admin-content-panel" id="tab-bookinginfo">
+                    <h4>📋 معلومات الحجز الإرشادية</h4>
+                    <div class="form-group"><label>العنوان</label><input id="editBookingTitle"></div>
+                    <div class="form-group"><label>الوصف</label><textarea id="editBookingDesc"></textarea></div>
+                    <div class="form-group"><label>المميزات والخدمات (ضع كل ميزة في سطر منفصل)</label><textarea id="editBookingFeatures" rows="5"></textarea></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSiteSection('bookingInfo')">💾 حفظ التعديلات</button>
+                </div>
+
+                <div class="admin-content-panel" id="tab-social">
+                    <h4>🔗 قنوات السوشيال ميديا والتواصل</h4>
+                    <table class="admin-table" id="adminSocialTable">
+                        <thead><tr><th>المنصة</th><th>الرابط الكامل</th><th>أيقونة فوت أوسوم</th><th>تعديل</th><th>حذف</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="admin-form-row">
+                        <input type="text" id="newSocialPlatform" placeholder="المنصة مثلاً TikTok">
+                        <input type="url" id="newSocialUrl" placeholder="الرابط الكامل">
+                        <input type="text" id="newSocialIcon" placeholder="fa-tiktok">
+                        <button class="btn btn-primary btn-sm" onclick="addSocialLink()">➕ إضافة رابط منصة</button>
+                    </div>
+                </div>
+
+                <div class="admin-content-panel" id="tab-footer">
+                    <h4>📄 حقوق الفوتر والـ Copyright</h4>
+                    <div class="form-group"><label>نص حقوق النشر</label><input id="editFooterText"></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSiteSection('footer')">💾 حفظ النص</button>
+                </div>
+
+                <div class="admin-content-panel" id="tab-backup">
+                    <h4>💾 نسخ احتياطي للبيانات</h4>
+                    <button class="btn btn-primary btn-sm" onclick="exportData()">📥 تصدير البيانات إلى جهازك</button>
+                    <div style="margin-top:12px;">
+                        <input type="file" id="restoreFileInput">
+                        <button class="btn-sm btn-info" onclick="importData()">📤 استعادة من نسخة احتياطية</button>
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid var(--border); margin:30px 0;">
+                    <h4>🔐 تغيير كلمة مرور لوحة التحكم الآمنة</h4>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>كلمة المرور الجديدة</label>
+                        <input type="password" id="newAdminPasswordInput" placeholder="أدخل 6 خانات أو أحرف كحد أدنى" style="max-width:300px;">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="changeAdminPassword()">🔄 تحديث كلمة المرور في السيرفر</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="bookingDetailModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+            <h4>تفاصيل وإدارة الحجز</h4>
+            <div id="modalBookingContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="editSocialModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditSocialModal()">&times;</button>
+            <h4>تعديل بيانات منصة التواصل</h4>
+            <div id="editSocialContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // الكود المصدري المحدث لربط الـ Firebase والـ Authentication المشفر بالكامل لقواعد البيانات
+        const firebaseConfig = {
+            apiKey: "AIzaSyCM7dSEaFwn8K9Om2QhJyGMuVTBelfJOws",
+            authDomain: "myronadisa.firebaseapp.com",
+            projectId: "myronadisa",
+            storageBucket: "myronadisa.firebasestorage.app",
+            messagingSenderId: "1045623927974",
+            appId: "1:1045623927974:web:b9b5c2de17161a200b7067",
+            measurementId: "G-Z7TXVDY2YF"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        } catch (e) {
+            console.log("Firebase غير متصل، استخدام localStorage الآلي كبديل محلي", e);
+        }
+
+        const DataLayer = {
+            async getCollection(name) {
+                if (db) {
+                    const snap = await db.collection(name).get();
+                    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                }
+                return JSON.parse(localStorage.getItem('rona_' + name) || '[]');
+            },
+            async addDocument(name, data) {
+                if (db) {
+                    const ref = await db.collection(name).add({ ...data,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    return ref.id;
+                }
+                const items = await this.getCollection(name);
+                const newItem = { id: 'local_' + Date.now(), ...data };
+                items.push(newItem);
+                localStorage.setItem('rona_' + name, JSON.stringify(items));
+                return newItem.id;
+            },
+            async updateDocument(name, id, data) {
+                if (db) {
+                    await db.collection(name).doc(id).update(data);
+                    return;
+                }
+                const items = await this.getCollection(name);
+                const idx = items.findIndex(i => i.id === id);
+                if (idx >= 0) {
+                    items[idx] = { ...items[idx], ...data };
+                    localStorage.setItem('rona_' + name, JSON.stringify(items));
+                }
+            },
+            async deleteDocument(name, id) {
+                if (db) {
+                    await db.collection(name).doc(id).delete();
+                    return;
+                }
+                const items = await this.getCollection(name);
+                localStorage.setItem('rona_' + name, JSON.stringify(items.filter(i => i.id !== id)));
+            },
+            async getSiteContent(section) {
+                const items = await this.getCollection('site_content');
+                return items.find(i => i.section === section) || null;
+            },
+            async saveSiteContent(section, data) {
+                const items = await this.getCollection('site_content');
+                const existing = items.find(i => i.section === section);
+                if (existing) await this.updateDocument('site_content', existing.id, { ...data, section });
+                else await this.addDocument('site_content', { section, ...data });
+            }
+        };
+
+        let currentGallery = [], currentSocial = [], currentBookings = [], currentCategories = ['wedding', 'portrait', 'product', 'event'];
+        let currentFilter = 'all', lightboxImages = [], lightboxIndex = 0, selectedDate = null, selectedTime = null;
+        let isAdminLoggedIn = false, calendarMonth, calendarYear, bookedDates = [];
+
+        function $(s) { return document.querySelector(s); }
+        function $$(s) { return document.querySelectorAll(s); }
+
+        window.addEventListener('load', () => setTimeout(() => $('#page-loader').classList.add('hidden'), 600));
+
+        const mainNav = $('#mainNav'), mobileMenuBtn = $('#mobileMenuBtn'), navLinks = $('#navLinks');
+        window.addEventListener('scroll', () => mainNav.classList.toggle('scrolled', window.scrollY > 80));
+        mobileMenuBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
+        navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('open')));
+
+        document.getElementById('modeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('rona_mode', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        });
+        if (localStorage.getItem('rona_mode') === 'light') document.body.classList.add('light-mode');
+
+        // مراقب حالة الأمان والحسابات السحابية المحدث
+        if (db) {
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    isAdminLoggedIn = true;
+                    $('#adminLoginSection').style.display = 'none';
+                    $('#adminContentSection').style.display = 'block';
+                    refreshAdminData();
+                } else {
+                    isAdminLoggedIn = false;
+                    $('#adminLoginSection').style.display = 'block';
+                    $('#adminContentSection').style.display = 'none';
+                }
+            });
+        }
+
+        async function initDefaultData() {
+            if ((await DataLayer.getCollection('gallery')).length === 0) {
+                const imgs = [
+                    { url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80', title: 'لحظة الفرح', category: 'wedding' },
+                    { url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&q=80', title: 'بورتريه أنيق', category: 'portrait' },
+                    { url: 'https://images.unsplash.com/photo-1504276048855-f3d60e69632f?w=600&q=80', title: 'تصوير منتج', category: 'product' },
+                    { url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80', title: 'حفل مميز', category: 'event' },
+                    { url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80', title: 'عرس فاخر', category: 'wedding' },
+                    { url: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600&q=80', title: 'لقطة إبداعية', category: 'portrait' }
+                ];
+                for (const img of imgs) await DataLayer.addDocument('gallery', img);
+            }
+            if ((await DataLayer.getCollection('social')).length === 0) {
+                await DataLayer.addDocument('social', { platform: 'Instagram', url: 'https://instagram.com', icon: 'fa-instagram' });
+                await DataLayer.addDocument('social', { platform: 'Facebook', url: 'https://facebook.com', icon: 'fa-facebook-f' });
+                await DataLayer.addDocument('social', { platform: 'Pinterest', url: 'https://pinterest.com', icon: 'fa-pinterest-p' });
+            }
+            if (!await DataLayer.getSiteContent('hero')) {
+                await DataLayer.saveSiteContent('hero', {
+                    subtitle: 'capturing moments of light',
+                    title: 'رونا السيد',
+                    desc: 'مصورة فوتوغرافية متخصصة في توثيق أجمل اللحظات بأسلوب فني راقٍ',
+                    bgUrl: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1920&q=80'
+                });
+            }
+            if (!await DataLayer.getSiteContent('about')) {
+                await DataLayer.saveSiteContent('about', {
+                    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80',
+                    heading: 'قصة شغف بالصورة',
+                    para1: 'أنا رونا السيد، مصورة فوتوغرافية مصرية أعشق التقاط اللحظات الفريدة وتحويلها إلى ذكريات خالدة. بدأت رحلتي مع التصوير منذ سنوات، ومنذ ذلك الحين وأنا أسعى لإبراز الجمال في كل تفصيلة.',
+                    para2: 'أؤمن أن كل صورة تحمل قصة، وكل لقطة تستحق أن تُروى بأسلوب فني يليق بها. أعمل على توثيق الأفراح، البورتريه، والمناسبات الخاصة برؤية إبداعية تمزج بين الكلاسيكية والمعاصرة.',
+                    stat1: 850, stat2: 320, stat3: 8
+                });
+            }
+            if (!await DataLayer.getSiteContent('bookingInfo')) {
+                await DataLayer.saveSiteContent('bookingInfo', {
+                    title: 'تفاصيل الحجز',
+                    desc: 'اختر التاريخ والوقت المناسبين لك، وسنتواصل معك لتأكيد الحجز ومناقشة كافة التفاصيل.',
+                    features: ['استشارة مجانية قبل الجلسة', 'تسليم الصور خلال 7 أيام عمل', 'إمكانية التعديل والتحسين', 'جلسة تصوير احترافية كاملة', 'ألبوم رقمي عالي الجودة']
+                });
+            }
+            if (!await DataLayer.getSiteContent('footer')) {
+                await DataLayer.saveSiteContent('footer', { copyright: '© 2026 Rona El Sayed. جميع الحقوق محفوظة.' });
+            }
+        }
+
+        async function loadContent() {
+            const hero = await DataLayer.getSiteContent('hero');
+            if (hero) {
+                $('#heroSubtitle').textContent = hero.subtitle;
+                $('#heroTitle').innerHTML = hero.title.replace('رونا', 'رونا <span>السيد</span>');
+                $('#heroDesc').textContent = hero.desc;
+                $('#heroBg').style.backgroundImage = `url(${hero.bgUrl})`;
+            }
+            const about = await DataLayer.getSiteContent('about');
+            if (about) {
+                $('#aboutImage').src = about.image;
+                $('#aboutHeading').textContent = about.heading;
+                $('#aboutPara1').textContent = about.para1;
+                $('#aboutPara2').textContent = about.para2;
+                const statEls = $$('.stat-number');
+                if (statEls[0]) statEls[0].setAttribute('data-count', about.stat1);
+                if (statEls[1]) statEls[1].setAttribute('data-count', about.stat2);
+                if (statEls[2]) statEls[2].setAttribute('data-count', about.stat3);
+                statEls.forEach(el => el.textContent = '0');
+            }
+            const bookingInfo = await DataLayer.getSiteContent('bookingInfo');
+            if (bookingInfo) {
+                $('#bookingInfoTitle').textContent = bookingInfo.title;
+                $('#bookingInfoDesc').textContent = bookingInfo.desc;
+                $('#bookingFeaturesList').innerHTML = (bookingInfo.features || []).map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('');
+            }
+            const footer = await DataLayer.getSiteContent('footer');
+            if (footer) $('#footerCopyright').textContent = footer.copyright;
+        }
+
+        async function loadGallery() {
+            currentGallery = await DataLayer.getCollection('gallery');
+            renderGallery();
+            renderGalleryFilters();
+        }
+
+        function renderGalleryFilters() {
+            const container = $('#galleryFilters');
+            if(!container) return;
+            container.innerHTML = `<button class="filter-btn ${currentFilter==='all'?'active':''}" data-filter="all">الكل</button>`;
+            currentCategories.forEach(cat => container.innerHTML += `<button class="filter-btn ${currentFilter===cat?'active':''}" data-filter="${cat}">${cat}</button>`);
+            container.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
+                currentFilter = this.dataset.filter;
+                renderGallery();
+                renderGalleryFilters();
+            }));
+        }
+
+        function renderGallery() {
+            const filtered = currentFilter === 'all' ? currentGallery : currentGallery.filter(i => i.category === currentFilter);
+            const grid = $('#galleryGrid');
+            if(!grid) return;
+            grid.innerHTML = filtered.map((item, idx) => `
+                <div class="gallery-item" onclick="openLightbox(${idx},'${currentFilter}')">
+                    <img src="${item.url}" onerror="this.src='https://via.placeholder.com/400x300/1a1a1a/c9a96e?text=Image'" alt="${item.title||'صورة'}">
+                    <div class="gallery-item-overlay"><i class="fas fa-search-plus"></i></div>
+                </div>`).join('');
+            lightboxImages = filtered;
+        }
+
+        function openLightbox(index, filter) {
+            lightboxImages = filter === 'all' ? currentGallery : currentGallery.filter(i => i.category === filter);
+            lightboxIndex = Math.max(0, Math.min(index, lightboxImages.length - 1));
+            updateLightbox();
+            $('#lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            $('#lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function navigateLightbox(dir) {
+            lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+            updateLightbox();
+        }
+
+        function updateLightbox() {
+            if (lightboxImages.length) $('#lightboxImg').src = lightboxImages[lightboxIndex].url;
+        }
+        document.addEventListener('keydown', e => {
+            if (!$('#lightbox').classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+        });
+
+        function buildCalendar(month, year) {
+            calendarMonth = month;
+            calendarYear = year;
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            const days = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            let h = `<div class="calendar-header"><button onclick="buildCalendar(${month===0?11:month-1},${month===0?year-1:year})"><i class="fas fa-chevron-right"></i></button><span class="calendar-month-label">${months[month]} ${year}</span><button onclick="buildCalendar(${month===11?0:month+1},${month===11?year+1:year})"><i class="fas fa-chevron-left"></i></button></div><div class="calendar-weekdays">${days.map(d=>`<span>${d}</span>`).join('')}</div><div class="calendar-days">`;
+            for (let i = firstDay - 1; i >= 0; i--) h += `<span class="calendar-day other-month">${new Date(year,month,0).getDate()-i}</span>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let cls = 'calendar-day';
+                if (dateStr === todayStr) cls += ' today';
+                if (bookedDates.includes(dateStr)) cls += ' booked';
+                if (selectedDate === dateStr) cls += ' selected';
+                if (new Date(year, month, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate()) && dateStr !== todayStr) cls += ' other-month';
+                h += `<span class="${cls}" data-date="${dateStr}" onclick="selectCalendarDate('${dateStr}',this)">${d}</span>`;
+            }
+            h += '</div>';
+            $('#bookingCalendar').innerHTML = h;
+        }
+
+        function selectCalendarDate(d, el) {
+            if (bookedDates.includes(d)) return;
+            selectedDate = d;
+            $('#selectedDate').value = d;
+            $$('#bookingCalendar .calendar-day').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            generateTimeSlots();
+        }
+
+        function generateTimeSlots() {
+            const s = ['09:00 ص', '10:00 ص', '11:00 ص', '12:00 م', '01:00 م', '02:00 م', '03:00 م', '04:00 م', '05:00 م'];
+            $('#timeSlots').innerHTML = s.map(t => `<span class="time-slot" onclick="selectTimeSlot('${t}',this)">${t}</span>`).join('');
+            selectedTime = null;
+            $('#selectedTime').value = '';
+        }
+
+        function selectTimeSlot(t, el) {
+            selectedTime = t;
+            $('#selectedTime').value = t;
+            $$('#timeSlots .time-slot').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        async function loadBookedDates() {
+            currentBookings = await DataLayer.getCollection('bookings');
+            bookedDates = currentBookings.filter(b => b.status === 'confirmed' || b.status === 'pending').map(b => b.date);
+        }
+        async function submitBooking(e) {
+            e.preventDefault();
+            const data = {
+                clientName: $('#bookingName').value,
+                email: $('#bookingEmail').value,
+                phone: $('#bookingPhone').value,
+                serviceType: $('#bookingService').value,
+                date: $('#selectedDate').value,
+                time: $('#selectedTime').value,
+                hours: $('#bookingHours').value,
+                location: $('#bookingLocation').value,
+                notes: $('#bookingNotes').value,
+                status: 'pending',
+                internalNotes: ''
+            };
+            await DataLayer.addDocument('bookings', data);
+            await loadBookedDates();
+            buildCalendar(calendarMonth, calendarYear);
+            $('#bookingForm').style.display = 'none';
+            $('#bookingSuccess').classList.add('show');
+        }
+
+        function resetBookingForm() {
+            $('#bookingForm').style.display = 'flex';
+            $('#bookingSuccess').classList.remove('show');
+            $('#bookingForm').reset();
+            selectedDate = null;
+            selectedTime = null;
+            buildCalendar(new Date().getMonth(), new Date().getFullYear());
+            generateTimeSlots();
+        }
+
+        async function loadSocialLinks() {
+            currentSocial = await DataLayer.getCollection('social');
+            renderSocialLinks();
+        }
+
+        function renderSocialLinks() {
+            $('#socialLinksContainer').innerHTML = currentSocial.map(s => `<a href="${s.url}" target="_blank" class="social-link" title="${s.platform}"><i class="fab ${s.icon}"></i></a>`).join('');
+        }
+
+        function openAdminPanel() {
+            $('#adminOverlay').classList.add('active');
+            if (!isAdminLoggedIn) {
+                $('#adminLoginSection').style.display = 'block';
+                $('#adminContentSection').style.display = 'none';
+            } else {
+                $('#adminLoginSection').style.display = 'none';
+                $('#adminContentSection').style.display = 'block';
+                refreshAdminData();
+            }
+        }
+
+        function closeAdminPanel() { $('#adminOverlay').classList.remove('active'); }
+
+        // تسجيل الدخول المشفر والموثق
+        async function adminLogin() {
+            const password = $('#adminPassword').value;
+            const email = "rona@mo.com"; 
+            
+            if(!password) return alert('❌ يرجى إدخال كلمة المرور');
+
+            if (!db) {
+                if (password === 'admin2024') {
+                    isAdminLoggedIn = true;
+                    $('#adminLoginSection').style.display = 'none';
+                    $('#adminContentSection').style.display = 'block';
+                    refreshAdminData();
+                } else alert('❌ كلمة المرور غير صحيحة (وضع محلي)');
+                return;
+            }
+
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                console.error(error);
+                alert('❌ خطأ: كلمة المرور المدخلة غير صحيحة أو الخادم غير متصل.');
+            }
+        }
+
+        async function adminLogout() {
+            if (db) {
+                await firebase.auth().signOut();
+            } else {
+                isAdminLoggedIn = false;
+                $('#adminLoginSection').style.display = 'block';
+                $('#adminContentSection').style.display = 'none';
+            }
+        }
+
+        // دالة تحديث كلمة المرور السحابية
+        async function changeAdminPassword() {
+            const newPassword = $('#newAdminPasswordInput').value;
+            if (!newPassword || newPassword.length < 6) {
+                return alert('❌ يجب أن تتكون كلمة المرور الجديدة من 6 أحرف أو أرقام على الأقل.');
+            }
+
+            if (!db) return alert('❌ تعذر العثور على خادم سحابي لتغيير الباسورد.');
+
+            const user = firebase.auth().currentUser;
+            if (user) {
+                try {
+                    await user.updatePassword(newPassword);
+                    alert('✅ مبروك، تم تحديث كلمة مرور حساب المسؤول السحابي بنجاح!');
+                    $('#newAdminPasswordInput').value = '';
+                } catch (error) {
+                    console.error(error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        alert('🔒 لإجراء تعديلات أمنية، سجل خروجك ثم ادخل مجدداً وقم بالتغيير مباشرة.');
+                    } else {
+                        alert('❌ حدث خطأ غير متوقع: ' + error.message);
+                    }
+                }
+            } else {
+                alert('❌ عملية غير مصرح بها.');
+            }
+        }
+
+        async function refreshAdminData() {
+            await loadBookedDates();
+            currentGallery = await DataLayer.getCollection('gallery');
+            currentSocial = await DataLayer.getCollection('social');
+            currentBookings = await DataLayer.getCollection('bookings');
+            renderAdminBookings();
+            renderAdminGallery();
+            renderAdminSocial();
+            const h = await DataLayer.getSiteContent('hero');
+            if (h) {
+                $('#editHeroSubtitle').value = h.subtitle;
+                $('#editHeroTitle').value = h.title;
+                $('#editHeroDesc').value = h.desc;
+                $('#editHeroBg').value = h.bgUrl;
+            }
+            const a = await DataLayer.getSiteContent('about');
+            if (a) {
+                $('#editAboutImage').value = a.image;
+                $('#editAboutHeading').value = a.heading;
+                $('#editAboutPara1').value = a.para1;
+                $('#editAboutPara2').value = a.para2;
+                $('#editStat1').value = a.stat1;
+                $('#editStat2').value = a.stat2;
+                $('#editStat3').value = a.stat3;
+            }
+            const bi = await DataLayer.getSiteContent('bookingInfo');
+            if (bi) {
+                $('#editBookingTitle').value = bi.title;
+                $('#editBookingDesc').value = bi.desc;
+                $('#editBookingFeatures').value = (bi.features || []).join('\n');
+            }
+            const f = await DataLayer.getSiteContent('footer');
+            if (f) $('#editFooterText').value = f.copyright;
+            renderGalleryFilters();
+            const catSelect = $('#newImageCategory');
+            if (catSelect) catSelect.innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function renderBookingStats() {
+            const stats = { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
+            currentBookings.forEach(b => { if (stats[b.status] !== undefined) stats[b.status]++; });
+            $('#bookingStats').innerHTML = `
+                <div class="stat-card"><div class="number">${stats.pending}</div><div>قيد الانتظار</div></div>
+                <div class="stat-card"><div class="number">${stats.confirmed}</div><div>مؤكدة</div></div>
+                <div class="stat-card"><div class="number">${stats.completed}</div><div>مكتملة</div></div>
+                <div class="stat-card"><div class="number">${stats.cancelled}</div><div>ملغاة</div></div>`;
+        }
+
+        function filterBookings() {
+            const s = ($('#bookingSearch')?.value || '').toLowerCase();
+            const st = $('#bookingStatusFilter')?.value || 'all';
+            const f = currentBookings.filter(b => (!s || (b.clientName || '').toLowerCase().includes(s)) && (st === 'all' || b.status === st));
+            renderBookingsTable(f);
+        }
+
+        function renderBookingsTable(bookings) {
+            const tbody = $('#adminBookingsTable tbody');
+            const labels = { pending: 'قيد الانتظار', confirmed: 'مؤكد', completed: 'مكتمل', cancelled: 'ملغي' };
+            const badges = { pending: 'badge-pending', confirmed: 'badge-confirmed', completed: 'badge-completed', cancelled: 'badge-cancelled' };
+            tbody.innerHTML = bookings.map(b => `
+                <tr class="booking-row" onclick="openBookingDetail('${b.id}')">
+                    <td>${b.clientName}<br><small>${b.email||''}</small></td>
+                    <td>${b.date}</td>
+                    <td>${b.time}</td>
+                    <td>${b.serviceType}</td>
+                    <td><span class="badge ${badges[b.status]}">${labels[b.status]}</span></td>
+                    <td onclick="event.stopPropagation()">
+                        ${b.status==='pending'?`<button class="btn-sm btn-success" onclick="updateBookingStatus('${b.id}','confirmed')">✓</button>`:''}
+                        ${b.status==='confirmed'?`<button class="btn-sm btn-info" onclick="updateBookingStatus('${b.id}','completed')">✓</button>`:''}
+                        ${b.status!=='cancelled'?`<button class="btn-sm btn-danger" onclick="updateBookingStatus('${b.id}','cancelled')">✕</button>`:''}
+                    </td>
+                </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:20px;">لا توجد حجوزات</td></tr>';
+        }
+
+        async function renderAdminBookings() { renderBookingStats(); filterBookings(); }
+        async function updateBookingStatus(id, st) {
+            await DataLayer.updateDocument('bookings', id, { status: st });
+            await refreshAdminData();
+            await loadBookedDates();
+            buildCalendar(calendarMonth, calendarYear);
+        }
+
+        function openBookingDetail(id) {
+            const b = currentBookings.find(b => b.id === id);
+            if (!b) return;
+            $('#modalBookingContent').innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div class="form-group"><label>الاسم</label><input id="editClientName" value="${b.clientName||''}"></div>
+                    <div class="form-group"><label>البريد</label><input id="editClientEmail" value="${b.email||''}"></div>
+                    <div class="form-group"><label>الهاتف</label><input id="editClientPhone" value="${b.phone||''}"></div>
+                    <div class="form-group"><label>الخدمة</label><select id="editServiceType">${['wedding','portrait','product','event'].map(o=>`<option value="${o}" ${b.serviceType===o?'selected':''}>${o}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>التاريخ</label><input type="date" id="editDate" value="${b.date||''}"></div>
+                    <div class="form-group"><label>الوقت</label><input id="editTime" value="${b.time||''}"></div>
+                    <div class="form-group"><label>الساعات</label><input type="number" id="editHours" value="${b.hours||1}"></div>
+                    <div class="form-group"><label>الموقع</label><input id="editLocation" value="${b.location||''}"></div>
+                    <div class="form-group" style="grid-column:span 2"><label>ملاحظات العميل</label><textarea id="editClientNotes">${b.notes||''}</textarea></div>
+                    <div class="form-group" style="grid-column:span 2"><label>ملاحظات داخلية</label><textarea id="editInternalNotes">${b.internalNotes||''}</textarea></div>
+                    <div class="form-group"><label>الحالة</label><select id="editStatus">${['pending','confirmed','completed','cancelled'].map(o=>`<option value="${o}" ${b.status===o?'selected':''}>${o}</option>`).join('')}</select></div>
+                </div>
+                <div style="margin-top:14px;display:flex;gap:8px;">
+                    <button class="btn btn-primary btn-sm" onclick="saveBookingChanges('${id}')">💾 حفظ التعديلات</button>
+                    <button class="btn-sm btn-danger" onclick="deleteBooking('${id}')">🗑️ حذف الحجز</button>
+                </div>`;
+            $('#bookingDetailModal').classList.add('active');
+        }
+
+        function closeBookingModal() { $('#bookingDetailModal').classList.remove('active'); }
+        async function saveBookingChanges(id) {
+            const d = {};
+            ['clientName', 'clientEmail', 'clientPhone', 'serviceType', 'date', 'time', 'hours', 'location', 'clientNotes', 'internalNotes', 'status'].forEach(k => {
+                const el = document.getElementById('edit' + k.charAt(0).toUpperCase() + k.slice(1));
+                if (el) d[k] = el.value;
+            });
+            await DataLayer.updateDocument('bookings', id, d);
+            closeBookingModal();
+            await refreshAdminData();
+            await loadBookedDates();
+            buildCalendar(calendarMonth, calendarYear);
+        }
+        async function deleteBooking(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الحجز؟')) {
+                await DataLayer.deleteDocument('bookings', id);
+                closeBookingModal();
+                await refreshAdminData();
+                await loadBookedDates();
+                buildCalendar(calendarMonth, calendarYear);
+            }
+        }
+
+        function renderAdminGallery() {
+            $('#adminGalleryTable tbody').innerHTML = currentGallery.map(g => `
+                <tr>
+                    <td><img src="${g.url}" style="width:60px;height:45px;object-fit:cover;border-radius:4px;" alt=""></td>
+                    <td>${g.title||''}</td>
+                    <td>${g.category}</td>
+                    <td><button class="btn-sm btn-danger" onclick="deleteGalleryImage('${g.id}')">🗑️</button></td>
+                </tr>`).join('');
+        }
+        async function addGalleryImage() {
+            const file = $('#imageFileInput').files[0];
+            let url = '';
+            if (file) {
+                url = await new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onload = e => r(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                url = prompt('أدخل رابط الصورة مباشر:');
+            }
+            if (!url) return;
+            const title = $('#newImageTitle').value;
+            const category = $('#newImageCategory').value;
+            await DataLayer.addDocument('gallery', { url, title, category });
+            $('#newImageTitle').value = '';
+            $('#imagePreview').style.display = 'none';
+            $('#imageFileInput').value = '';
+            await refreshAdminData();
+            await loadGallery();
+            renderGallery();
+        }
+        async function deleteGalleryImage(id) {
+            if (confirm('حذف هذه الصورة؟')) {
+                await DataLayer.deleteDocument('gallery', id);
+                await refreshAdminData();
+                await loadGallery();
+                renderGallery();
+            }
+        }
+        async function addNewCategory() {
+            const cat = $('#newCategoryName').value.trim();
+            if (cat && !currentCategories.includes(cat)) {
+                currentCategories.push(cat);
+                $('#newCategoryName').value = '';
+                await refreshAdminData();
+                renderGalleryFilters();
+            }
+        }
+        document.getElementById('imageUploadArea').addEventListener('click', () => $('#imageFileInput').click());
+        document.getElementById('imageFileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    $('#imagePreview').src = e.target.result;
+                    $('#imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function renderAdminSocial() {
+            $('#adminSocialTable tbody').innerHTML = currentSocial.map(s => `
+                <tr>
+                    <td>${s.platform}</td>
+                    <td><a href="${s.url}" target="_blank" style="color:var(--gold);">${(s.url||'').substring(0,25)}...</a></td>
+                    <td><i class="fab ${s.icon}" style="color:var(--text-secondary);"></i></td>
+                    <td><button class="btn-sm btn-info" onclick="editSocialLink('${s.id}')">✏️</button></td>
+                    <td><button class="btn-sm btn-danger" onclick="deleteSocialLink('${s.id}')">🗑️</button></td>
+                </tr>`).join('');
+        }
+        async function addSocialLink() {
+            const p = $('#newSocialPlatform').value, u = $('#newSocialUrl').value, i = $('#newSocialIcon').value;
+            if (p && u && i) {
+                await DataLayer.addDocument('social', { platform: p, url: u, icon: i });
+                $('#newSocialPlatform').value = '';
+                $('#newSocialUrl').value = '';
+                $('#newSocialIcon').value = '';
+                await refreshAdminData();
+                renderSocialLinks();
+            }
+        }
+
+        function editSocialLink(id) {
+            const s = currentSocial.find(s => s.id === id);
+            if (!s) return;
+            $('#editSocialContent').innerHTML = `
+                <div class="form-group"><label>المنصة</label><input id="editSPlatform" value="${s.platform}"></div>
+                <div class="form-group"><label>الرابط الكامل</label><input id="editSUrl" value="${s.url}"></div>
+                <div class="form-group"><label>الأيقونة (مثال: fa-instagram)</label><input id="editSIcon" value="${s.icon}"></div>
+                <button class="btn btn-primary btn-sm" onclick="saveSocialEdit('${id}')">💾 حفظ</button>`;
+            $('#editSocialModal').classList.add('active');
+        }
+
+        function closeEditSocialModal() { $('#editSocialModal').classList.remove('active'); }
+        async function saveSocialEdit(id) {
+            const p = $('#editSPlatform').value, u = $('#editSUrl').value, i = $('#editSIcon').value;
+            await DataLayer.updateDocument('social', id, { platform: p, url: u, icon: i });
+            closeEditSocialModal();
+            await refreshAdminData();
+            renderSocialLinks();
+        }
+        async function deleteSocialLink(id) {
+            if (confirm('حذف هذا الرابط؟')) {
+                await DataLayer.deleteDocument('social', id);
+                await refreshAdminData();
+                renderSocialLinks();
+            }
+        }
+
+        async function saveSiteSection(section) {
+            if (section === 'hero') await DataLayer.saveSiteContent('hero', {
+                subtitle: $('#editHeroSubtitle').value,
+                title: $('#editHeroTitle').value,
+                desc: $('#editHeroDesc').value,
+                bgUrl: $('#editHeroBg').value
+            });
+            else if (section === 'about') await DataLayer.saveSiteContent('about', {
+                image: $('#editAboutImage').value,
+                heading: $('#editAboutHeading').value,
+                para1: $('#editAboutPara1').value,
+                para2: $('#editAboutPara2').value,
+                stat1: +$('#editStat1').value,
+                stat2: +$('#editStat2').value,
+                stat3: +$('#editStat3').value
+            });
+            else if (section === 'bookingInfo') await DataLayer.saveSiteContent('bookingInfo', {
+                title: $('#editBookingTitle').value,
+                desc: $('#editBookingDesc').value,
+                features: $('#editBookingFeatures').value.split('\n').filter(f => f.trim())
+            });
+            else if (section === 'footer') await DataLayer.saveSiteContent('footer', { copyright: $('#editFooterText').value });
+            await loadContent();
+            alert('✅ تم الحفظ بنجاح سحابياً');
+        }
+
+        async function exportData() {
+            const data = {
+                gallery: await DataLayer.getCollection('gallery'),
+                social: await DataLayer.getCollection('social'),
+                bookings: await DataLayer.getCollection('bookings'),
+                site_content: await DataLayer.getCollection('site_content'),
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'rona_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+        }
+
+        async function importData() {
+            const file = $('#restoreFileInput').files[0];
+            if (!file) return;
+            if (!confirm('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟')) return;
+            const text = await file.text();
+            try {
+                const data = JSON.parse(text);
+                for (const coll of Object.keys(data)) {
+                    localStorage.setItem('rona_' + coll, JSON.stringify(data[coll]));
+                }
+                alert('✅ تمت استعادة البيانات بنجاح');
+                location.reload();
+            } catch (e) {
+                alert('❌ الملف غير صالح أو تالف');
+            }
+        }
+
+        document.querySelector('.admin-tabs').addEventListener('click', e => {
+            if (e.target.classList.contains('admin-tab') && e.target.dataset.tab) {
+                $$('.admin-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                $$('.admin-content-panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(e.target.dataset.tab);
+                if (panel) panel.classList.add('active');
+            }
+        });
+
+        const aboutObserver = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                $$('.stat-number').forEach(el => {
+                    const target = +el.dataset.count;
+                    let start = null;
+                    function step(ts) {
+                        if (!start) start = ts;
+                        const p = Math.min((ts - start) / 2000, 1);
+                        el.textContent = Math.floor(p * target) + '+';
+                        if (p < 1) requestAnimationFrame(step);
+                    }
+                    requestAnimationFrame(step);
+                });
+                aboutObserver.disconnect();
+            }
+        }, { threshold: 0.5 });
+        const aboutSection = $('#about');
+        if (aboutSection) aboutObserver.observe(aboutSection);
+
+        async function init() {
+            await initDefaultData();
+            await loadContent();
+            await loadGallery();
+            await loadSocialLinks();
+            await loadBookedDates();
+            const now = new Date();
+            calendarMonth = now.getMonth();
+            calendarYear = now.getFullYear();
+            buildCalendar(calendarMonth, calendarYear);
+            generateTimeSlots();
+        }
+        init();
+    </script>
+</body>
+</html>
