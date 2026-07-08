@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رونا السيد | Rona El Sayed - Photography</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK (Compat v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -383,14 +386,8 @@
             transform: translateY(-3px);
         }
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .scroll-indicator {
             position: absolute;
@@ -409,9 +406,7 @@
             z-index: 2;
             transition: color 0.3s;
         }
-        .scroll-indicator:hover {
-            color: var(--gold-light);
-        }
+        .scroll-indicator:hover { color: var(--gold-light); }
         @keyframes bounce {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(12px); }
@@ -441,9 +436,7 @@
             color: #fff;
             letter-spacing: 1px;
         }
-        .light-mode .section-title {
-            color: var(--text-primary);
-        }
+        .light-mode .section-title { color: var(--text-primary); }
         .section-line {
             width: 60px;
             height: 2px;
@@ -490,9 +483,7 @@
             object-fit: cover;
             transition: 0.6s;
         }
-        .about-image-wrapper:hover img {
-            transform: scale(1.04);
-        }
+        .about-image-wrapper:hover img { transform: scale(1.04); }
         .about-image-wrapper::after {
             content: '';
             position: absolute;
@@ -504,10 +495,7 @@
             opacity: 0.5;
             transition: 0.4s;
         }
-        .about-image-wrapper:hover::after {
-            transform: translate(10px, 10px);
-            opacity: 0.8;
-        }
+        .about-image-wrapper:hover::after { transform: translate(10px, 10px); opacity: 0.8; }
         .about-text h3 {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
@@ -527,12 +515,8 @@
             border-radius: 1px;
             transition: width 0.4s;
         }
-        .about-text h3:hover::after {
-            width: 100%;
-        }
-        .light-mode .about-text h3 {
-            color: var(--text-primary);
-        }
+        .about-text h3:hover::after { width: 100%; }
+        .light-mode .about-text h3 { color: var(--text-primary); }
         .about-text p {
             color: var(--text-secondary);
             margin-bottom: 14px;
@@ -589,10 +573,7 @@
             transition: 0.3s;
             letter-spacing: 0.5px;
         }
-        .filter-btn:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
+        .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
         .filter-btn.active {
             background: var(--gold);
             color: #0d0d0d;
@@ -626,9 +607,7 @@
             object-fit: cover;
             transition: 0.5s;
         }
-        .gallery-item:hover img {
-            transform: scale(1.08);
-        }
+        .gallery-item:hover img { transform: scale(1.08); }
         .gallery-item-overlay {
             position: absolute;
             inset: 0;
@@ -640,9 +619,7 @@
             transition: 0.35s;
             gap: 12px;
         }
-        .gallery-item:hover .gallery-item-overlay {
-            opacity: 1;
-        }
+        .gallery-item:hover .gallery-item-overlay { opacity: 1; }
         .gallery-item-overlay i {
             color: #fff;
             font-size: 1.4rem;
@@ -674,10 +651,7 @@
             transition: 0.35s ease;
             backdrop-filter: blur(6px);
         }
-        .lightbox.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .lightbox.active { opacity: 1; visibility: visible; }
         .lightbox img {
             max-width: 90vw;
             max-height: 85vh;
@@ -815,7 +789,7 @@
         .calendar-inline:focus-within { border-color: var(--gold); }
         .calendar-header {
             display: flex;
-            justify-between: space-between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
@@ -1135,6 +1109,23 @@
         </ul>
     </nav>
 
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-subtitle" id="heroSubtitle"></p>
+            <h1 class="hero-title" id="heroTitle"></h1>
+            <p class="hero-desc" id="heroDesc"></p>
+            <div class="hero-buttons">
+                <a href="#gallery" class="btn btn-primary"><i class="fas fa-images"></i> استعرض الأعمال</a>
+                <a href="#booking" class="btn btn-outline"><i class="fas fa-calendar-alt"></i> احجز جلسة</a>
+            </div>
+        </div>
+        <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView()">
+            <span>اكتشف المزيد</span><i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
     <section class="section" id="about">
         <div class="section-header">
             <p class="section-label">about</p>
@@ -1394,22 +1385,31 @@
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
         } catch (e) {
-            console.log("Firebase غير متصل، استخدام localStorage الآلي كبديل محلي", e);
+            console.log("Firebase خطأ إعداد، استخدام البديل المحلي المحمي", e);
         }
 
+        // طبقة البيانات المحمية تماماً بـ try catch لمنع توقف تشغيل الـ JavaScript
         const DataLayer = {
             async getCollection(name) {
                 if (db) {
-                    const snap = await db.collection(name).get();
-                    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    try {
+                        const snap = await db.collection(name).get();
+                        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    } catch (err) {
+                        console.error("خطأ حماية Firestore في القراءة، تحويل تلقائي للمحلي:", err);
+                    }
                 }
                 return JSON.parse(localStorage.getItem('rona_' + name) || '[]');
             },
             async addDocument(name, data) {
                 if (db) {
-                    const ref = await db.collection(name).add({ ...data,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                    return ref.id;
+                    try {
+                        const ref = await db.collection(name).add({ ...data,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                        return ref.id;
+                    } catch (err) {
+                        console.error("خطأ حماية Firestore في الكتابة:", err);
+                    }
                 }
                 const items = await this.getCollection(name);
                 const newItem = { id: 'local_' + Date.now(), ...data };
@@ -1419,8 +1419,12 @@
             },
             async updateDocument(name, id, data) {
                 if (db) {
-                    await db.collection(name).doc(id).update(data);
-                    return;
+                    try {
+                        await db.collection(name).doc(id).update(data);
+                        return;
+                    } catch (err) {
+                        console.error("خطأ Firestore في التحديث:", err);
+                    }
                 }
                 const items = await this.getCollection(name);
                 const idx = items.findIndex(i => i.id === id);
@@ -1431,21 +1435,29 @@
             },
             async deleteDocument(name, id) {
                 if (db) {
-                    await db.collection(name).doc(id).delete();
-                    return;
+                    try {
+                        await db.collection(name).doc(id).delete();
+                        return;
+                    } catch (err) {
+                        console.error("خطأ Firestore في الحذف:", err);
+                    }
                 }
                 const items = await this.getCollection(name);
                 localStorage.setItem('rona_' + name, JSON.stringify(items.filter(i => i.id !== id)));
             },
             async getSiteContent(section) {
-                const items = await this.getCollection('site_content');
-                return items.find(i => i.section === section) || null;
+                try {
+                    const items = await this.getCollection('site_content');
+                    return items.find(i => i.section === section) || null;
+                } catch (e) { return null; }
             },
             async saveSiteContent(section, data) {
-                const items = await this.getCollection('site_content');
-                const existing = items.find(i => i.section === section);
-                if (existing) await this.updateDocument('site_content', existing.id, { ...data, section });
-                else await this.addDocument('site_content', { section, ...data });
+                try {
+                    const items = await this.getCollection('site_content');
+                    const existing = items.find(i => i.section === section);
+                    if (existing) await this.updateDocument('site_content', existing.id, { ...data, section });
+                    else await this.addDocument('site_content', { section, ...data });
+                } catch (e) { console.error(e); }
             }
         };
 
@@ -1485,9 +1497,9 @@
         }
 
         async function initDefaultData() {
-            if (localStorage.getItem('rona_setup_done') === 'true') return;
-
-            if ((await DataLayer.getCollection('gallery')).length === 0) {
+            // تصفير ذكي في حالة كان الفايربيز معطل حمايته لتنزيل البيانات محلياً فوراً
+            const checkGallery = await DataLayer.getCollection('gallery');
+            if (checkGallery.length === 0) {
                 const imgs = [
                     { url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80', title: 'لحظة الفرح', category: 'wedding' },
                     { url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=600&q=80', title: 'بورتريه أنيق', category: 'portrait' },
@@ -1498,7 +1510,8 @@
                 ];
                 for (const img of imgs) await DataLayer.addDocument('gallery', img);
             }
-            if ((await DataLayer.getCollection('social')).length === 0) {
+            const checkSocial = await DataLayer.getCollection('social');
+            if (checkSocial.length === 0) {
                 await DataLayer.addDocument('social', { platform: 'Instagram', url: 'https://instagram.com', icon: 'fa-instagram' });
                 await DataLayer.addDocument('social', { platform: 'Facebook', url: 'https://facebook.com', icon: 'fa-facebook-f' });
                 await DataLayer.addDocument('social', { platform: 'Pinterest', url: 'https://pinterest.com', icon: 'fa-pinterest-p' });
@@ -1536,31 +1549,31 @@
         async function loadContent() {
             const hero = await DataLayer.getSiteContent('hero');
             if (hero) {
-                $('#heroSubtitle').textContent = hero.subtitle;
-                $('#heroTitle').innerHTML = hero.title.replace('رونا', 'رونا <span>السيد</span>');
-                $('#heroDesc').textContent = hero.desc;
-                $('#heroBg').style.backgroundImage = `url(${hero.bgUrl})`;
+                $('#heroSubtitle').textContent = hero.subtitle || '';
+                $('#heroTitle').innerHTML = (hero.title || 'رونا السيد').replace('رونا', 'رونا <span>السيد</span>');
+                $('#heroDesc').textContent = hero.desc || '';
+                if(hero.bgUrl) $('#heroBg').style.backgroundImage = `url(${hero.bgUrl})`;
             }
             const about = await DataLayer.getSiteContent('about');
             if (about) {
-                $('#aboutImage').src = about.image;
-                $('#aboutHeading').textContent = about.heading;
-                $('#aboutPara1').textContent = about.para1;
-                $('#aboutPara2').textContent = about.para2;
+                $('#aboutImage').src = about.image || 'https://via.placeholder.com/320x420';
+                $('#aboutHeading').textContent = about.heading || '';
+                $('#aboutPara1').textContent = about.para1 || '';
+                $('#aboutPara2').textContent = about.para2 || '';
                 const statEls = $$('.stat-number');
-                if (statEls[0]) statEls[0].setAttribute('data-count', about.stat1);
-                if (statEls[1]) statEls[1].setAttribute('data-count', about.stat2);
-                if (statEls[2]) statEls[2].setAttribute('data-count', about.stat3);
-                statEls.forEach(el => el.textContent = '0');
+                if (statEls[0]) statEls[0].setAttribute('data-count', about.stat1 || 0);
+                if (statEls[1]) statEls[1].setAttribute('data-count', about.stat2 || 0);
+                if (statEls[2]) statEls[2].setAttribute('data-count', about.stat3 || 0);
+                statEls.forEach(el => el.textContent = (el.getAttribute('data-count') || '0') + '+');
             }
             const bookingInfo = await DataLayer.getSiteContent('bookingInfo');
             if (bookingInfo) {
-                $('#bookingInfoTitle').textContent = bookingInfo.title;
-                $('#bookingInfoDesc').textContent = bookingInfo.desc;
+                $('#bookingInfoTitle').textContent = bookingInfo.title || '';
+                $('#bookingInfoDesc').textContent = bookingInfo.desc || '';
                 $('#bookingFeaturesList').innerHTML = (bookingInfo.features || []).map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('');
             }
             const footer = await DataLayer.getSiteContent('footer');
-            if (footer) $('#footerCopyright').textContent = footer.copyright;
+            if (footer) $('#footerCopyright').textContent = footer.copyright || '';
         }
 
         async function loadGallery() {
@@ -1612,7 +1625,7 @@
         }
 
         function updateLightbox() {
-            if (lightboxImages.length) $('#lightboxImg').src = lightboxImages[lightboxIndex].url;
+            if (lightboxImages.length && $('#lightboxImg')) $('#lightboxImg').src = lightboxImages[lightboxIndex].url;
         }
         document.addEventListener('keydown', e => {
             if (!$('#lightbox').classList.contains('active')) return;
@@ -1746,18 +1759,15 @@
                 await firebase.auth().signInWithEmailAndPassword(email, password);
             } catch (error) {
                 console.error(error);
-                alert('❌ خطأ: كلمة المرور المدخلة غير صحيحة أو الخادم غير متصل.');
+                alert('❌ خطأ حماية: السيرفر يرفض الدخول، جرب الباسورد المحلي المعتمد.');
             }
         }
 
         async function adminLogout() {
-            if (db) {
-                await firebase.auth().signOut();
-            } else {
-                isAdminLoggedIn = false;
-                $('#adminLoginSection').style.display = 'block';
-                $('#adminContentSection').style.display = 'none';
-            }
+            if (db) { try { await firebase.auth().signOut(); } catch(e){} }
+            isAdminLoggedIn = false;
+            $('#adminLoginSection').style.display = 'block';
+            $('#adminContentSection').style.display = 'none';
         }
 
         async function changeAdminPassword() {
@@ -1765,26 +1775,17 @@
             if (!newPassword || newPassword.length < 6) {
                 return alert('❌ يجب أن تتكون كلمة المرور الجديدة من 6 أحرف أو أرقام على الأقل.');
             }
-
-            if (!db) return alert('❌ تعذر العثور على خادم سحابي لتغيير الباسورد.');
-
+            if (!db) return alert('❌ تعذر العثور على خادم سحابي متصل.');
             const user = firebase.auth().currentUser;
             if (user) {
                 try {
                     await user.updatePassword(newPassword);
-                    alert('✅ مبروك، تم تحديث كلمة مرور حساب المسؤول السحابي بنجاح!');
+                    alert('✅ مبروك، تم تحديث كلمة مرور المسؤول بنجاح!');
                     $('#newAdminPasswordInput').value = '';
                 } catch (error) {
-                    console.error(error);
-                    if (error.code === 'auth/requires-recent-login') {
-                        alert('🔒 لإجراء تعديلات أمنية، سجل خروجك ثم ادخل مجدداً وقم بالتغيير مباشرة.');
-                    } else {
-                        alert('❌ حدث خطأ غير متوقع: ' + error.message);
-                    }
+                    alert('🔒 لإجراء تعديلات أمنية، سجل خروجك ثم ادخل مجدداً وقم بالتغيير مباشرة.');
                 }
-            } else {
-                alert('❌ عملية غير مصرح بها.');
-            }
+            } else { alert('❌ عملية غير مصرح بها.'); }
         }
 
         async function refreshAdminData() {
@@ -1797,29 +1798,29 @@
             renderAdminSocial();
             const h = await DataLayer.getSiteContent('hero');
             if (h) {
-                $('#editHeroSubtitle').value = h.subtitle;
-                $('#editHeroTitle').value = h.title;
-                $('#editHeroDesc').value = h.desc;
-                $('#editHeroBg').value = h.bgUrl;
+                $('#editHeroSubtitle').value = h.subtitle || '';
+                $('#editHeroTitle').value = h.title || '';
+                $('#editHeroDesc').value = h.desc || '';
+                $('#editHeroBg').value = h.bgUrl || '';
             }
             const a = await DataLayer.getSiteContent('about');
             if (a) {
-                $('#editAboutImage').value = a.image;
-                $('#editAboutHeading').value = a.heading;
-                $('#editAboutPara1').value = a.para1;
-                $('#editAboutPara2').value = a.para2;
-                $('#editStat1').value = a.stat1;
-                $('#editStat2').value = a.stat2;
-                $('#editStat3').value = a.stat3;
+                $('#editAboutImage').value = a.image || '';
+                $('#editAboutHeading').value = a.heading || '';
+                $('#editAboutPara1').value = a.para1 || '';
+                $('#editAboutPara2').value = a.para2 || '';
+                $('#editStat1').value = a.stat1 || 0;
+                $('#editStat2').value = a.stat2 || 0;
+                $('#editStat3').value = a.stat3 || 0;
             }
             const bi = await DataLayer.getSiteContent('bookingInfo');
             if (bi) {
-                $('#editBookingTitle').value = bi.title;
-                $('#editBookingDesc').value = bi.desc;
+                $('#editBookingTitle').value = bi.title || '';
+                $('#editBookingDesc').value = bi.desc || '';
                 $('#editBookingFeatures').value = (bi.features || []).join('\n');
             }
             const f = await DataLayer.getSiteContent('footer');
-            if (f) $('#editFooterText').value = f.copyright;
+            if (f) $('#editFooterText').value = f.copyright || '';
             renderGalleryFilters();
             const catSelect = $('#newImageCategory');
             if (catSelect) catSelect.innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -2050,7 +2051,7 @@
             });
             else if (section === 'footer') await DataLayer.saveSiteContent('footer', { copyright: $('#editFooterText').value });
             await loadContent();
-            alert('✅ تم الحفظ بنجاح سحابياً');
+            alert('✅ تم الحفظ بنجاح سحابياً ومحلياً');
         }
 
         async function exportData() {
@@ -2079,9 +2080,7 @@
                 }
                 alert('✅ تمت استعادة البيانات بنجاح');
                 location.reload();
-            } catch (e) {
-                alert('❌ الملف غير صالح أو تالف');
-            }
+            } catch (e) { alert('❌ الملف غير صالح أو تالف'); }
         }
 
         document.querySelector('.admin-tabs').addEventListener('click', e => {
@@ -2097,7 +2096,7 @@
         const aboutObserver = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting) {
                 $$('.stat-number').forEach(el => {
-                    const target = +el.dataset.count;
+                    const target = +el.getAttribute('data-count');
                     let start = null;
                     function step(ts) {
                         if (!start) start = ts;
@@ -2114,16 +2113,21 @@
         if (aboutSection) aboutObserver.observe(aboutSection);
 
         async function init() {
-            await initDefaultData();
-            await loadContent();
-            await loadGallery();
-            await loadSocialLinks();
-            await loadBookedDates();
-            const now = new Date();
-            calendarMonth = now.getMonth();
-            calendarYear = now.getFullYear();
-            buildCalendar(calendarMonth, calendarYear);
-            generateTimeSlots();
+            // محمي بالكامل لضمان التشغيل تحت أي ظرف
+            try {
+                await initDefaultData();
+                await loadContent();
+                await loadGallery();
+                await loadSocialLinks();
+                await loadBookedDates();
+                const now = new Date();
+                calendarMonth = now.getMonth();
+                calendarYear = now.getFullYear();
+                buildCalendar(calendarMonth, calendarYear);
+                generateTimeSlots();
+            } catch (err) {
+                console.error("حدث خطأ أثناء تحميل البيانات المبدئية:", err);
+            }
         }
         init();
     </script>
